@@ -1,0 +1,9 @@
+{% if latest_quests %}
+    <ul>
+    {% for quest in latest_quests %}
+        <li><a href="/quest/{{ quest.id }}/">{{ quest.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No questionnaires are available.</p>
+{% endif %}

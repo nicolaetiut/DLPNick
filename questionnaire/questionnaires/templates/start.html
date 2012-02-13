@@ -1,0 +1,8 @@
+<h1>{{ quest.name }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="/quest/{{ quest.id }}/0/" method="post">
+{% csrf_token %}
+<input type="submit" value="Start questionnaire" />
+</form>

@@ -1,0 +1,15 @@
+<h1>{{ quest.name }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="/quest/{{ quest.id }}/{{ page_id }}/" method="post">
+{% csrf_token %}
+    {% for question in page.question_set.all %}
+        <label>{{ question.question_text }}</label><br />
+        {% for answer in question.answer_set.all %}
+            <input type="radio" name="answer{{ question }}" id="answer{{ forloop.counter }}" value="{{ answer.id }}" />
+            <label for="answer{{ forloop.counter }}">{{ answer.answer_text }}</label><br />
+        {% endfor %}
+    {% endfor %}
+<input type="submit" value="Next" />
+</form>
