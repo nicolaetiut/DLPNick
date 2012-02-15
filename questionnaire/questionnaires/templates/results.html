@@ -1,0 +1,24 @@
+<h1>Your result is:</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<p>{{ result.result_text }}</p>
+{% if answer_less %}
+    {% for ans in answer_less %}     
+        <p>For getting a lower result you could change:</p>
+        <p> In page {{ ans.page_id }} </p>
+        <p>Question: {{ ans.answer.question.question_text }}</p>
+        <p>Answer: {{ ans.answer.answer_text }}</p>
+    {%endfor%}
+    
+{% endif %}
+{% if answer_more %}
+    {% for ans in answer_more %}     
+        <p>For getting a better result you could change:</p>
+        <p> In page {{ ans.page_id }} </p>
+        <p>Question: {{ ans.answer.question.question_text }}</p>
+        <p>Answer: {{ ans.answer.answer_text }}</p>
+    {%endfor%}
+{% endif %}
+
+
