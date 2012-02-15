@@ -10,16 +10,20 @@ class Questionnaire(models.Model):
         return self.name
 
 class Page(models.Model):
+    ordering = ['order_index']
     questionnaire = models.ForeignKey(Questionnaire)
     title = models.CharField(max_length=50)
+    order_index = models.IntegerField()
     def __unicode__(self):
         return self.title
     def __str__(self):
         return self.title
     
 class Question(models.Model):
+    ordering = ['order_index']
     page = models.ForeignKey(Page)
     question_text = models.CharField(max_length=200)
+    order_index = models.IntegerField()
     def __unicode__(self):
         return self.question_text
     def __str__(self):
