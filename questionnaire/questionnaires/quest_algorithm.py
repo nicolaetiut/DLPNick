@@ -7,11 +7,12 @@ def check_page(page, answers, lower):
     for question in page.question_set.all():
         new_answer = None
         max_local_diff = 0
-        for ans in question.answer_set.all()if ans != answers[question.id]:
-            diff = ans.score - answers[question.id]['score']
-            if (diff * is_negative) > 0 and diff > max_local_diff:
-                max_local_diff = diff
-                new_answer = ans
+        for ans in question.answer_set.all():
+            if ans != answers[question.id]:
+                diff = ans.score - answers[question.id]['score']
+                if (diff * is_negative) > 0 and diff > max_local_diff:
+                    max_local_diff = diff
+                    new_answer = ans
         if max_local_diff > 0 and max_local_diff > max_diff:
             max_diff = max_local_diff
             diff_answer = new_answer
