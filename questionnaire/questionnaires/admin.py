@@ -5,10 +5,14 @@ from questionnaires.models import Answer
 from questionnaires.models import Result
 from django.contrib import admin
 
+
 class QuestionnaireAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['name']}),
-        ('Date information', {'fields': ['creation_date', 'description'], 'classes': ['collapse']}),
+        ('Date information', {
+            'fields': ['creation_date', 'description'],
+            'classes': ['collapse']
+        }),
     ]
 
 admin.site.register(Questionnaire, QuestionnaireAdmin)
