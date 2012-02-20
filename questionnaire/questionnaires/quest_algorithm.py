@@ -10,16 +10,17 @@ def check_page(page, answers, lower):
         for ans in question.answer_set.all():
             if ans != answers[question.id]:
                 diff = ans.score - answers[question.id]['score']
-                if (diff * is_negative) > 0 and diff > max_local_diff:
-                    max_local_diff = diff
-                    new_answer = ans
+                if (diff * is_negative) > 0:
+                    if (diff * is_negative) > max_local_diff:
+                        max_local_diff = diff * is_negative
+                        new_answer = ans
         if max_local_diff > 0 and max_local_diff > max_diff:
-            max_diff = max_local_diff
+            max_diff = max_local_diff * is_negative
             diff_answer = new_answer
     return {
             'page_id': page.id,
             'answer': diff_answer,
-            'difference': max_diff
+            'difference': max_diff * is_negative
             }
 
 
@@ -27,7 +28,9 @@ def check_result(quest, answers, difference, lower=False):
     answer = []
     results = []
     for page in quest.page_set.all():
-        results.append(check_page(page, answers, lower))
+        res = check_page(page, answers, lower)
+        if res['answer']:
+            results.append(res)
     results.sort(key=lambda x: x['answer'].score, reverse=True)
     for res in results:
         if difference > 0:

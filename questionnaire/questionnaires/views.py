@@ -14,21 +14,38 @@ def index(request):
 def results(request, quest_id):
     q = get_object_or_404(Questionnaire, pk=quest_id)
     current_answers = request.session.get("current_answers")
-    res = 0
+    current_p = request.session.get("current_page_id")
+    if not current_p or int(current_p) < len(q.page_set.all()):
+        if not current_p:
+            current_p = 0
+        return HttpResponseRedirect(
+            reverse('questionnaires.views.go_to_page',
+                args=(q.id, int(current_p) + 1,)))
+    score = 0
+    answer_more = None
+    answer_less = None
+    results = q.result_set.all()
     for value in current_answers.values():
-        res = res + value['score']
+        score = score + value['score']
     final_result = None
-    for result in q.result_set.all():
-        if res < result.upper_limit:
-            final_result = result
+    i = 0
+    for i in range(0,len(results)):
+        if score < results[i].upper_limit:
+            final_result = results[i]
             break
     if final_result:
-        up_diff = final_result.upper_limit + 1 - res
-        dw_diff = final_result.upper_limit + 1 - res
-        answer_less = quest_algorithm.check_result(q, current_answers, up_diff)
-        answer_more = quest_algorithm.check_result(q, current_answers, dw_diff)
+        if i > 0:
+            dw_diff = score - results[i - 1].upper_limit + 1
+            answer_less = quest_algorithm.check_result(q, current_answers, dw_diff, True)
+        if i < (len(results) - 1):
+            up_diff = final_result.upper_limit + 1 - score
+            answer_more = quest_algorithm.check_result(q, current_answers, up_diff)
+    request.session["current_quest_id"] = None
+    request.session["current_page_id"] = None
+    request.session["current_answers"] = {}
     return render_to_response('results.html', {
                     'quest': q,
+                    'score': score,
                     'result': final_result,
                     'answer_less': answer_less,
                     'answer_more': answer_more
@@ -46,7 +63,7 @@ def start(request, quest_id):
 
 def go_to_page(request, quest_id, page_id):
     q = get_object_or_404(Questionnaire, pk=quest_id)
-    page = list(q.page_set.all())[int(page_id) - 1]
+    page = q.page_set.all()[int(page_id) - 1]
     current_q = request.session.get("current_quest_id")
     current_p = request.session.get("current_page_id")
     if current_q and current_q == quest_id:
@@ -76,7 +93,7 @@ def go_to_page(request, quest_id, page_id):
 def validate(request, quest_id, page_id):
     q = get_object_or_404(Questionnaire, pk=quest_id)
 
-    page = list(q.page_set.all())[int(page_id) - 1]
+    page = q.page_set.all()[int(page_id) - 1]
     current_answers = request.session.get("current_answers")
     answers = current_answers
     for question in page.question_set.all():
@@ -93,7 +110,7 @@ def validate(request, quest_id, page_id):
     request.session["current_answers"] = current_answers
     request.session["current_page_id"] = page_id
 
-    if int(page_id) == len(list(q.page_set.all())):
+    if int(page_id) == len(q.page_set.all()):
         return HttpResponseRedirect(
             reverse('questionnaires.views.results',
                     args=(q.id,)))
